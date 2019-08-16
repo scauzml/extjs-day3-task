@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script type="text/javascript" src="../ext-3.3.0/adapter/ext/ext-base.js"></script>
+    <script type="text/javascript" src="../ext-3.3.0/ext-all.js"></script>
+    <link rel="stylesheet" type="text/css" href="../ext-3.3.0/resources/css/ext-all.css" />
+    <title>Document</title>
+    <script>
+        Ext.onReady(function () {
+            var currentNode1 = null;
+
+            var addClass = function (currentNode, text, fromOperate) {
+                if (currentNode.attributes.qtip.indexOf('withoutbl') >= 0) {
+                    var newClass = new Ext.tree.TreeNode({
+                        text: text,
+                        qtip: 'class',
+                        icon: '../images/class.png',
+                    });
+                    currentNode.appendChild(newClass);
+                    if (fromOperate === 'fromMemuAddClass') {
+                        edit(newClass);
+                    }
+                } else {
+                    Ext.Msg.alert('tip', '请选择添加班级目录');
+                }
+            }
+
+            var addStudent = function (currentNode, text, fromOperate) {
+                var student = new Ext.tree.TreeNode({
+                    text: text,
+                    qtip: 'student',
+                    icon: '../images/student.png',
+                })
+                if (currentNode.attributes.qtip.indexOf('student') >= 0) {
+                    currentNode.parentNode.appendChild(student);
+                    if (fromOperate === 'fromMemuAddStudent') {
+                        edit(student);
+                    }
+
+                } else if (currentNode.attributes.qtip.indexOf('class') >= 0) {
+                    currentNode.appendChild(student);
+                    if (fromOperate === 'fromMemuAddStudent') {
+                        edit(student);
+                    }
+                } else {
+                    Ext.Msg.alert('tip', '请选择班级目录');
+                }
+            }
+
+            var edit = function (editNode) {
+                treeEditor.editNode = editNode;
+                treeEditor.startEdit(editNode.ui.textNode, '');
+            }
+
+            var menu = new Ext.menu.Menu({
+                items: [{
+                        id: 'addStudent',
+                        text: 'addStudent'
+                    },
+                    {
+                        id: 'addClass',
+                        text: 'addClass'
+                    },
+                ],
+                listeners: {
+                    itemclick: function (item) {
+                        currentNode1 = item.parentMenu.contextNode;
+                        var currentNode = item.parentMenu.contextNode;
+                        switch (item.id) {
+                            case 'addClass':
+                                addClass(currentNode, 'newClass(请点击修改)', 'fromMemuAddClass');
+                                break;
+                            case 'addStudent':
+                                addStudent(currentNode, 'student(请点击修改)', 'fromMemuAddStudent');
+                                break;
+                        }
+                    }
+                }
+            })
+
+            var classTreeRoot = new Ext.tree.AsyncTreeNode({});
+
+            var contextMenuFunction = function (node, e) {
+                node.select(); //选到当前node,获取阴影
+                var treeContextMenu = node.getOwnerTree().contextMenu;
+                treeContextMenu.contextNode = node;
+                treeContextMenu.showAt(e.getXY());
+            }
+
+            var classTree = new Ext.tree.TreePanel({
+                el: 'tree-div',
+                animate: true,
+                enableDD: true,
+                selModel: new Ext.tree.MultiSelectionModel({}),
+                loader: new Ext.tree.TreeLoader({
+                    dataUrl: 'classData.txt'
+                }),
+                root: classTreeRoot,
+                contextMenu: menu,
+                listeners: {
+                    contextmenu: contextMenuFunction
+                },
+            });
+
+            classTree.on('click', function (node) {
+                currentNode1 = node;
+            });
+
+            var treeEditor = new Ext.tree.TreeEditor(classTree, {
+                allowBlank: false
+            });
+
+            classTree.expandAll();
+            classTree.render();
+            
+            Ext.get('add').on('click', function () {
+
+                var inputfield = Ext.get('inputfield').getValue();
+                if (currentNode1 != null) {
+                    if (inputfield != '') {
+                        if (currentNode1.attributes.qtip.indexOf('student') >= 0 || currentNode1
+                            .attributes.qtip.indexOf('class') >= 0) {
+                            addStudent(currentNode1, inputfield, 'formInputField');
+                        } else if (currentNode1.attributes.qtip.indexOf('withoutbl') >= 0) {
+                            addClass(currentNode1, inputfield, 'formInputField');
+                        } else {
+                            Ext.Msg.alert('tip', '请选择添加班级或以下节点')
+                        }
+
+                    }
+                } else {
+                    Ext.Msg.alert('tip', '请选择添加班级或以下节点');
+                }
+            })
+        })
+    </script>
+</head>
+
+<body>
+
+    <div id="tree-div"></div>
+    <div class="inputAdd">
+        <input type="text" id="inputfield" placeholder='请输入班级或者学生名字'><button id="add"
+            style="margin-left:30px">add</button>
+    </div>
+</body>
+
+</html>

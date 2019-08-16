@@ -1,0 +1,38 @@
+[  {
+        id:'allblshipments',
+        qtip:'allblshipments',
+        text: 'All BL/Shipments',
+        children:[
+         {
+        id:'FirstLoad',
+        qtip:'FirstLoad',
+        text: 'First Load',
+        children:[
+        {
+        id:'withoutbl',
+        text: '添加班级',
+        qtip:'withoutbl',
+        children:[
+            {
+                id:'classShipment#1',
+                text: 'class1',
+                icon: '../images/class.png',
+                qtip:'class',
+                children:[
+                    {
+                id:'52k1mxa',
+                qtip:'student',
+                icon: '../images/student.png',
+                text: 'lance',
+                allowChildren:false,
+                leaf:true,  
+                    }
+                ]      
+            },
+        ]
+        },        
+        ]
+        }, 
+        ]
+    }
+]
